@@ -1,7 +1,7 @@
 {
   "compilerOptions": {
     "target": "ES2022",
-    "module": "commonjs",  // Change this from "ESNext" to "commonjs"
+    "module": "ESNext",
     "moduleResolution": "node",
     "allowSyntheticDefaultImports": true,
     "esModuleInterop": true,
@@ -15,7 +15,10 @@
     "declaration": true,
     "outDir": "./dist",
     "rootDir": "./src",
-    "baseUrl": "./src"
+    "baseUrl": "./src",
+    "paths": {
+      "@shared/*": ["shared/*"]
+    }
   },
   "include": ["src/**/*"],
   "exclude": ["node_modules", "dist"]
