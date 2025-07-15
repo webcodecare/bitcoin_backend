@@ -68,6 +68,15 @@ export async function seedUsers() {
     },
   ];
 
+  // Option 1: Delete existing users before inserting
+  await pool.query('DELETE FROM users WHERE email IN ($1, $2, $3, $4, $5)', [
+    'superadmin@demo.com',
+    'admin@test.com',
+    'user1@test.com',
+    'user2@test.com',
+    'newuser@test.com'
+  ]);
+
   for (const user of users) {
     const hashedPassword = bcrypt.hashSync(user.password, 10); // Hash the password
     
@@ -78,7 +87,14 @@ export async function seedUsers() {
         created_at, updated_at
       )
       VALUES ($1, $2, $3, $4, $5, true, $6, $7, $8, NOW(), NOW())
-      RETURNING id`, // Returning id to get the auto-generated user id
+      ON CONFLICT (email) DO UPDATE
+      SET 
+        hashed_password = EXCLUDED.hashed_password,
+        subscription_tier = EXCLUDED.subscription_tier,
+        subscription_status = EXCLUDED.subscription_status,
+        subscription_ends_at = EXCLUDED.subscription_ends_at,
+        updated_at = NOW()
+      RETURNING id`, 
       [
         user.email,
         hashedPassword,
