@@ -1,7 +1,6 @@
 import { Pool } from 'pg';
 import bcrypt from 'bcryptjs';
 import dotenv from 'dotenv';
-import jwt from 'jsonwebtoken'; // Import the jsonwebtoken library
 
 dotenv.config();
 
@@ -51,22 +50,11 @@ export async function seedUsers() {
       subscriptionStatus: 'trialing',
       subscriptionEndsAt: new Date(Date.now() + 7 * 24 * 60 * 60 * 1000), // 7-day trial
     },
-    // New user example
-    {
-      email: 'newuser@test.com',
-      password: 'newpassword123',
-      role: 'user',
-      firstName: 'New',
-      lastName: 'User',
-      subscriptionTier: 'basic',
-      subscriptionStatus: 'active',
-      subscriptionEndsAt: new Date(Date.now() + 30 * 24 * 60 * 60 * 1000), // +30 days
-    },
   ];
 
   for (const user of users) {
-    const hashedPassword = bcrypt.hashSync(user.password, 10);
-    const result = await pool.query(
+    const hashed = bcrypt.hashSync(user.password, 10);
+    await pool.query(
       `INSERT INTO users (
         email, hashed_password, role, first_name, last_name, is_active,
         subscription_tier, subscription_status, subscription_ends_at,
@@ -78,11 +66,10 @@ export async function seedUsers() {
         hashed_password = EXCLUDED.hashed_password,
         subscription_tier = EXCLUDED.subscription_tier,
         subscription_status = EXCLUDED.subscription_status,
-        subscription_ends_at = EXCLUDED.subscription_ends_at,
-        updated_at = NOW() RETURNING id`,
+        subscription_ends_at = EXCLUDED.subscription_ends_at`,
       [
         user.email,
-        hashedPassword,
+        hashed,
         user.role,
         user.firstName,
         user.lastName,
@@ -91,17 +78,7 @@ export async function seedUsers() {
         user.subscriptionEndsAt,
       ]
     );
-
-    const newUser = result.rows[0];  // Retrieve the inserted or updated user ID
-
-    // Generate JWT Token
-    const token = jwt.sign(
-      { userId: newUser.id, email: user.email, role: user.role },
-      process.env.JWT_SECRET, // Ensure this is in your .env file
-      { expiresIn: '7d' } // Token expiration
-    );
-
-    console.log(`✅ User "${user.email}" created with token: ${token}`);
+    console.log(`✅ User "${user.email}" inserted or updated.`);
   }
 
   await pool.end();
