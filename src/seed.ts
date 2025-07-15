@@ -1,8 +1,14 @@
 import { Pool } from 'pg';
 import bcrypt from 'bcryptjs';
 import dotenv from 'dotenv';
+import jwt from 'jsonwebtoken';
 
-dotenv.config();
+dotenv.config(); // Load .env variables
+
+// Check that JWT_SECRET is set
+if (!process.env.JWT_SECRET) {
+  throw new Error('❌ JWT_SECRET is not defined in your .env file');
+}
 
 const pool = new Pool({
   connectionString: process.env.DATABASE_URL,
@@ -28,7 +34,7 @@ export async function seedUsers() {
       lastName: 'Admin',
       subscriptionTier: 'premium',
       subscriptionStatus: 'active',
-      subscriptionEndsAt: new Date(Date.now() + 30 * 24 * 60 * 60 * 1000), // +30 days
+      subscriptionEndsAt: new Date(Date.now() + 30 * 24 * 60 * 60 * 1000),
     },
     {
       email: 'user1@test.com',
@@ -38,7 +44,7 @@ export async function seedUsers() {
       lastName: 'User',
       subscriptionTier: 'basic',
       subscriptionStatus: 'trialing',
-      subscriptionEndsAt: new Date(Date.now() + 7 * 24 * 60 * 60 * 1000), // 7-day trial
+      subscriptionEndsAt: new Date(Date.now() + 7 * 24 * 60 * 60 * 1000), // 7 days
     },
     {
       email: 'user2@test.com',
@@ -48,13 +54,24 @@ export async function seedUsers() {
       lastName: 'User',
       subscriptionTier: 'free',
       subscriptionStatus: 'trialing',
-      subscriptionEndsAt: new Date(Date.now() + 7 * 24 * 60 * 60 * 1000), // 7-day trial
+      subscriptionEndsAt: new Date(Date.now() + 7 * 24 * 60 * 60 * 1000),
+    },
+    {
+      email: 'newuser@test.com',
+      password: 'newpassword123',
+      role: 'user',
+      firstName: 'New',
+      lastName: 'User',
+      subscriptionTier: 'basic',
+      subscriptionStatus: 'active',
+      subscriptionEndsAt: new Date(Date.now() + 30 * 24 * 60 * 60 * 1000),
     },
   ];
 
   for (const user of users) {
-    const hashed = bcrypt.hashSync(user.password, 10);
-    await pool.query(
+    const hashedPassword = bcrypt.hashSync(user.password, 10);
+
+    const result = await pool.query(
       `INSERT INTO users (
         email, hashed_password, role, first_name, last_name, is_active,
         subscription_tier, subscription_status, subscription_ends_at,
@@ -66,10 +83,12 @@ export async function seedUsers() {
         hashed_password = EXCLUDED.hashed_password,
         subscription_tier = EXCLUDED.subscription_tier,
         subscription_status = EXCLUDED.subscription_status,
-        subscription_ends_at = EXCLUDED.subscription_ends_at`,
+        subscription_ends_at = EXCLUDED.subscription_ends_at,
+        updated_at = NOW()
+      RETURNING id`,
       [
         user.email,
-        hashed,
+        hashedPassword,
         user.role,
         user.firstName,
         user.lastName,
@@ -78,14 +97,24 @@ export async function seedUsers() {
         user.subscriptionEndsAt,
       ]
     );
-    console.log(`✅ User "${user.email}" inserted or updated.`);
+
+    const newUser = result.rows[0];
+
+    // ✅ JWT Generation with secret guaranteed to be present
+    const token = jwt.sign(
+      { userId: newUser.id, email: user.email, role: user.role },
+      process.env.JWT_SECRET,
+      { expiresIn: '7d' }
+    );
+
+    console.log(`✅ User "${user.email}" created/updated with token: ${token}`);
   }
 
   await pool.end();
-  console.log("🎉 All users seeded.");
+  console.log('🎉 All users seeded successfully.');
 }
 
 seedUsers().catch((err) => {
-  console.error("❌ Error seeding users:", err);
+  console.error('❌ Error seeding users:', err);
   pool.end();
 });
