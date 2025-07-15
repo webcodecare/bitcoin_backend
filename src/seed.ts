@@ -89,5 +89,3 @@ seedUsers().catch((err) => {
   console.error("❌ Error seeding users:", err);
   pool.end();
 });
-
-
