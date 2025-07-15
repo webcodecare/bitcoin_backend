@@ -8,7 +8,7 @@ const pool = new Pool({
   connectionString: process.env.DATABASE_URL,
 });
 
-async function seedUsers() {
+export async function seedUsers() {
   const users = [
     {
       email: 'superadmin@demo.com',
