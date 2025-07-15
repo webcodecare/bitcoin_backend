@@ -69,8 +69,8 @@ export async function seedUsers() {
   ];
 
   for (const user of users) {
-    const hashedPassword = bcrypt.hashSync(user.password, 10);
-
+    const hashedPassword = bcrypt.hashSync(user.password, 10); // Hash the password
+    
     const result = await pool.query(
       `INSERT INTO users (
         email, hashed_password, role, first_name, last_name, is_active,
@@ -78,27 +78,20 @@ export async function seedUsers() {
         created_at, updated_at
       )
       VALUES ($1, $2, $3, $4, $5, true, $6, $7, $8, NOW(), NOW())
-      ON CONFLICT (email) DO UPDATE
-      SET 
-        hashed_password = EXCLUDED.hashed_password,
-        subscription_tier = EXCLUDED.subscription_tier,
-        subscription_status = EXCLUDED.subscription_status,
-        subscription_ends_at = EXCLUDED.subscription_ends_at,
-        updated_at = NOW()
-      RETURNING id`,
+      RETURNING id`, // Returning id to get the auto-generated user id
       [
         user.email,
         hashedPassword,
-        user.role,
-        user.firstName,
-        user.lastName,
-        user.subscriptionTier,
-        user.subscriptionStatus,
-        user.subscriptionEndsAt,
+        user.role ?? "user",
+        user.firstName ?? null,
+        user.lastName ?? null,
+        user.subscriptionTier ?? "free",
+        user.subscriptionStatus ?? null,
+        user.subscriptionEndsAt ?? null,
       ]
     );
 
-    const newUser = result.rows[0];
+    const newUser = result.rows[0]; // The returned user data from the database
 
     // ✅ JWT Generation with secret guaranteed to be present
     const token = jwt.sign(
@@ -107,7 +100,7 @@ export async function seedUsers() {
       { expiresIn: '7d' }
     );
 
-    console.log(`✅ User "${user.email}" created/updated with token: ${token}`);
+    console.log(`✅ User "${user.email}" created with ID: ${newUser.id} and token: ${token}`);
   }
 
   await pool.end();
