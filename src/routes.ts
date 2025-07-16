@@ -1,4 +1,4 @@
-import type { Express } from "express";
+import type { Express, Request, Response } from "express";
 import { createServer, type Server } from "http";
 import { WebSocketServer, WebSocket } from "ws";
 import bcrypt from "bcryptjs";
@@ -59,8 +59,8 @@ const validateInput = (req: any, res: any, next: any) => {
 };
 
 // SQL injection prevention
-const validateUuid = param('id').isUUID().withMessage('Invalid ID format');
-const validateEmail = body('email').isEmail().normalizeEmail().withMessage('Invalid email format');
+// const validateUuid = param('id').isUUID().withMessage('Invalid ID format');
+// const validateEmail = body('email').isEmail().normalizeEmail().withMessage('Invalid email format');
 const validatePassword = body('password')
   .isLength({ min: 8, max: 128 })
   .withMessage('Password must be between 8 and 128 characters')
@@ -315,12 +315,13 @@ export async function registerRoutes(app: Express): Promise<Server> {
 
   // Secure auth routes with validation
   app.post('/api/auth/register', [
-    validateEmail,
-    validatePassword,
-    body('firstName').optional().isLength({ min: 1, max: 50 }).trim().escape(),
-    body('lastName').optional().isLength({ min: 1, max: 50 }).trim().escape(),
-    validateInput
-  ], async (req, res) => {
+    // validateEmail,
+    // validatePassword,
+    // body('firstName').optional().isLength({ min: 1, max: 50 }).trim().escape(),
+    // body('lastName').optional().isLength({ min: 1, max: 50 }).trim().escape(),
+    // validateInput
+  ], async (req:Request, res:Response) => {
+    // console.log(req.body)
     try {
       const { email, password, firstName, lastName } = req.body;
 
@@ -395,7 +396,7 @@ export async function registerRoutes(app: Express): Promise<Server> {
 
   // Secure login route with validation
   app.post('/api/auth/login', [
-    validateEmail,
+    // validateEmail,
     body('password').notEmpty().withMessage('Password is required'),
     validateInput
   ], async (req, res) => {
