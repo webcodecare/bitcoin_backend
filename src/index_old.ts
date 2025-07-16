@@ -48,6 +48,15 @@ app.use(cors({
   methods: ['GET', 'POST', 'PUT', 'DELETE', 'PATCH', 'OPTIONS'],
   allowedHeaders: ['Content-Type', 'Authorization', 'X-Requested-With']
 }));
+// app.use(
+//   cors({
+//     origin: ['http://localhost:3000'],
+//     methods: 'GET,HEAD,PUT,PATCH,POST,DELETE',
+//     allowedHeaders:
+//       'Content-Type, Authorization, Origin, X-Requested-With, Accept',
+//     credentials: true,
+//   }),
+// );
 
 // Rate limiting
 const limiter = rateLimit({

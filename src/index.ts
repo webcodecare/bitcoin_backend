@@ -5,8 +5,9 @@ import cors from "cors";
 import dotenv from "dotenv";
 dotenv.config();
 
-
+// Cleaned: bodyParser removed since express.json handles parsing
 import rateLimit from "express-rate-limit";
+
 import { registerRoutes } from "./routes.js";
 import { initializeTickers } from "./init-tickers.js";
 import { startNotificationProcessor } from "./services/scheduledProcessor.js";
@@ -15,6 +16,10 @@ import { dataValidationMiddleware } from "./middleware/dataValidation.js";
 
 const app = express();
 const port = Number(process.env.PORT) || 3001;
+
+// Middleware setup
+app.use(express.json());
+app.use(express.urlencoded({ extended: true }));
 
 app.use(
   helmet({
@@ -61,34 +66,39 @@ const limiter = rateLimit({
   max: 100,
   message: "Too many requests from this IP, please try again later.",
 });
-
 app.use("/api", limiter);
 
 // Security & validation middleware
 app.use(securityMiddleware);
 app.use(dataValidationMiddleware);
 
+// Only log warnings for missing services in development
 if (process.env.NODE_ENV === "development") {
-  console.log("SMS Service not configured - missing Twilio credentials");
-  console.log("Telegram Service not configured - missing bot token");
+  console.log("⚠️ SMS Service not configured - missing Twilio credentials");
+  console.log("⚠️ Telegram Service not configured - missing bot token");
 }
 
+// HTTP server
 const server = createServer(app);
 
-async function initializeServices() {
+// Async initialization wrapped in IIFE
+(async () => {
   try {
+    // Register WebSocket routes
+    await registerRoutes(app);
+
+    // Initialize crypto tickers and services
     await initializeTickers();
-    console.log("Cryptocurrency tickers initialized successfully");
+    console.log("✅ Cryptocurrency tickers initialized successfully");
+
+    // Start background processors
+    startNotificationProcessor();
+
+    // Start the server
+    server.listen(port, "0.0.0.0", () => {
+      console.log(`🚀 Backend API server running on port ${port}`);
+    });
   } catch (error) {
-    console.error("Failed to initialize tickers:", error);
+    console.error("❌ Error during server startup:", error);
   }
-
-  startNotificationProcessor();
-}
-
-const wsServer = await registerRoutes(app);
-await initializeServices();
-
-server.listen(port, "0.0.0.0", () => {
-  console.log(`Backend API server running on port ${port}`);
-});
+})();
