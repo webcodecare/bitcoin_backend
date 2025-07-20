@@ -67,16 +67,13 @@ const validatePassword = body('password')
   .matches(/^(?=.*[a-z])(?=.*[A-Z])(?=.*\d)(?=.*[@$!%*?&])[A-Za-z\d@$!%*?&]/)
   .withMessage('Password must contain at least one uppercase letter, one lowercase letter, one number, and one special character');
 
-// Initialize Stripe (optional for development)
-let stripe: Stripe | null = null;
-if (process.env.STRIPE_SECRET_KEY) {
-  stripe = new Stripe(process.env.STRIPE_SECRET_KEY, {
-    apiVersion: "2024-11-20.acacia",
-  });
-  console.log('✅ Stripe initialized');
-} else {
-  console.log('⚠️  Stripe not configured - payment features disabled');
+// Initialize Stripe
+if (!process.env.STRIPE_SECRET_KEY) {
+  throw new Error('Missing required Stripe secret: STRIPE_SECRET_KEY');
 }
+const stripe = new Stripe(process.env.STRIPE_SECRET_KEY, {
+  apiVersion: "2024-11-20.acacia",
+});
 
 export async function registerRoutes(app: Express): Promise<Server> {
   const httpServer = createServer(app);
@@ -1064,65 +1061,6 @@ export async function registerRoutes(app: Express): Promise<Server> {
     }
   });
 
-  // Get alert signals for WeeklySignalChart (from Supabase-style endpoint)
-  app.get('/api/signals/alerts', async (req: any, res) => {
-    try {
-      const { ticker, timeframe, days } = req.query;
-      
-      // Get signals from storage with filters
-      let signals = await storage.getSignals(1000); // Get more signals for filtering
-      
-      // Filter by ticker (support both BTCUSD and BTCUSDT)
-      if (ticker) {
-        const targetTicker = ticker as string;
-        signals = signals.filter(signal => 
-          signal.ticker === targetTicker || 
-          (targetTicker === 'BTCUSD' && (signal.ticker === 'BTCUSDT' || signal.ticker === 'BTCUSD')) ||
-          (targetTicker === 'BTCUSDT' && (signal.ticker === 'BTCUSD' || signal.ticker === 'BTCUSDT'))
-        );
-      }
-      
-      // Filter by timeframe
-      if (timeframe) {
-        const targetTimeframe = timeframe as string;
-        signals = signals.filter(signal => 
-          signal.timeframe === targetTimeframe || 
-          (targetTimeframe === '1W' && (signal.timeframe === '1w' || signal.timeframe === '1W'))
-        );
-      }
-      
-      // Filter by date range (past X days)
-      if (days) {
-        const daysCount = parseInt(days as string);
-        const cutoffDate = new Date();
-        cutoffDate.setDate(cutoffDate.getDate() - daysCount);
-        
-        signals = signals.filter(signal => 
-          new Date(signal.timestamp) >= cutoffDate
-        );
-      }
-      
-      // Transform to expected format for WeeklySignalChart
-      const alertSignals = signals.map(signal => ({
-        id: signal.id,
-        ticker: signal.ticker,
-        signalType: signal.signalType,
-        price: parseFloat(signal.price),
-        timestamp: signal.timestamp.toISOString(),
-        timeframe: signal.timeframe,
-        notes: signal.note || undefined
-      }));
-      
-      // Sort by timestamp (newest first)
-      alertSignals.sort((a, b) => new Date(b.timestamp).getTime() - new Date(a.timestamp).getTime());
-      
-      res.json(alertSignals);
-    } catch (error) {
-      console.error('Error fetching alert signals:', error);
-      res.status(500).json({ message: 'Failed to get alert signals' });
-    }
-  });
-
   // Get all signals with pagination, sorting, and filtering
   app.get('/api/signals/all', async (req, res) => {
     try {
@@ -1553,55 +1491,6 @@ export async function registerRoutes(app: Express): Promise<Server> {
     }
   });
 
-  // Seed weekly signals endpoint (for demo purposes)
-  app.post('/api/seed-weekly-signals', async (req: any, res) => {
-    try {
-      // Create sample weekly signals for BTCUSDT over the past 2 years
-      const weeklySignals = [
-        // 2024 Signals
-        { ticker: 'BTCUSDT', signalType: 'BUY', price: '42000', timeframe: '1W', timestamp: new Date('2024-01-15'), source: 'algorithm', note: 'Weekly support level bounce - Strong bullish divergence on RSI' },
-        { ticker: 'BTCUSDT', signalType: 'SELL', price: '48000', timeframe: '1W', timestamp: new Date('2024-02-28'), source: 'algorithm', note: 'Weekly resistance rejection - Overbought conditions' },
-        { ticker: 'BTCUSDT', signalType: 'BUY', price: '38000', timeframe: '1W', timestamp: new Date('2024-04-10'), source: 'algorithm', note: 'Halving cycle accumulation zone - Historical support confluence' },
-        { ticker: 'BTCUSDT', signalType: 'SELL', price: '65000', timeframe: '1W', timestamp: new Date('2024-06-25'), source: 'algorithm', note: 'Post-halving distribution phase - Weekly bearish engulfing' },
-        { ticker: 'BTCUSDT', signalType: 'BUY', price: '56000', timeframe: '1W', timestamp: new Date('2024-08-05'), source: 'algorithm', note: 'Weekly hammer reversal - Oversold bounce from key level' },
-        { ticker: 'BTCUSDT', signalType: 'SELL', price: '68000', timeframe: '1W', timestamp: new Date('2024-09-18'), source: 'algorithm', note: 'Weekly shooting star pattern - Resistance confluence at 68k' },
-        { ticker: 'BTCUSDT', signalType: 'BUY', price: '61000', timeframe: '1W', timestamp: new Date('2024-11-12'), source: 'algorithm', note: 'Election cycle rally initiation - Bullish weekly close above 60k' },
-        
-        // 2025 Signals
-        { ticker: 'BTCUSDT', signalType: 'SELL', price: '95000', timeframe: '1W', timestamp: new Date('2025-01-08'), source: 'algorithm', note: 'Weekly exhaustion gap - Extreme greed readings and volume spike' },
-        { ticker: 'BTCUSDT', signalType: 'BUY', price: '78000', timeframe: '1W', timestamp: new Date('2025-02-20'), source: 'algorithm', note: 'Weekly doji reversal - Institutional accumulation zone' },
-        { ticker: 'BTCUSDT', signalType: 'SELL', price: '89000', timeframe: '1W', timestamp: new Date('2025-04-15'), source: 'algorithm', note: 'Weekly double top formation - Bearish divergence confirmed' },
-        { ticker: 'BTCUSDT', signalType: 'BUY', price: '72000', timeframe: '1W', timestamp: new Date('2025-06-18'), source: 'algorithm', note: 'Weekly support hold - Bullish whale accumulation detected' },
-        { ticker: 'BTCUSDT', signalType: 'SELL', price: '98000', timeframe: '1W', timestamp: new Date('2025-07-01'), source: 'algorithm', note: 'Weekly resistance test - Distribution volume increasing' }
-      ];
-
-      // Insert signals into database
-      const createdSignals = [];
-      for (const signalData of weeklySignals) {
-        try {
-          const signal = await storage.createSignal({
-            ...signalData,
-            userId: null // System generated
-          });
-          createdSignals.push(signal);
-        } catch (error) {
-          console.error('Error creating signal:', error);
-        }
-      }
-
-      res.json({ 
-        message: `Successfully seeded ${createdSignals.length} weekly signals for BTCUSDT`,
-        signals: createdSignals.length,
-        timeRange: '2024-2025',
-        ticker: 'BTCUSDT',
-        timeframe: '1W'
-      });
-    } catch (error) {
-      console.error('Error seeding weekly signals:', error);
-      res.status(500).json({ message: 'Failed to seed weekly signals' });
-    }
-  });
-
   // User Alerts API
   app.get('/api/alerts', async (req: any, res) => {
     try {
@@ -1853,15 +1742,15 @@ export async function registerRoutes(app: Express): Promise<Server> {
       }
 
       // Enforce Ticker Validation Against available_tickers
-      const availableTickers = await storage.getEnabledTickers();
+      const availableTickers = await storage.getAllTickers();
       const validTicker = availableTickers.find(t => 
-        t.symbol === symbol
+        t.symbol === symbol && t.enabled
       );
       
       if (!validTicker) {
         return res.status(400).json({ 
           message: `Invalid or disabled ticker: ${symbol}`,
-          availableTickers: availableTickers.map(t => t.symbol)
+          availableTickers: availableTickers.filter(t => t.enabled).map(t => t.symbol)
         });
       }
 
@@ -3507,13 +3396,6 @@ export async function registerRoutes(app: Express): Promise<Server> {
   // Create Stripe Checkout Session for Subscription
   app.post("/api/create-subscription", async (req, res) => {
     try {
-      if (!stripe) {
-        return res.status(503).json({ 
-          message: "Payment processing not available - Stripe not configured",
-          code: "STRIPE_NOT_CONFIGURED"
-        });
-      }
-
       const { planTier, billingInterval = "monthly", promoCode } = req.body;
       const userId = req.user?.id;
 
@@ -3597,12 +3479,6 @@ export async function registerRoutes(app: Express): Promise<Server> {
 
   // Stripe Webhook Handler
   app.post("/api/stripe-webhook", async (req, res) => {
-    if (!stripe) {
-      return res.status(503).json({ 
-        message: "Stripe webhooks not available - Stripe not configured" 
-      });
-    }
-
     const sig = req.headers["stripe-signature"];
     let event;
 
@@ -3650,13 +3526,6 @@ export async function registerRoutes(app: Express): Promise<Server> {
   // Customer Portal (for managing subscriptions)
   app.post("/api/customer-portal", async (req, res) => {
     try {
-      if (!stripe) {
-        return res.status(503).json({ 
-          message: "Customer portal not available - Stripe not configured",
-          code: "STRIPE_NOT_CONFIGURED"
-        });
-      }
-
       const userId = req.user?.id;
       if (!userId) {
         return res.status(401).json({ message: "Authentication required" });

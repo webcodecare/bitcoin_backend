@@ -202,4 +202,4 @@ The API follows REST conventions with consistent response formats:
 ### Rate Limit Headers
 - `X-RateLimit-Limit`: Request limit
 - `X-RateLimit-Remaining`: Remaining requests
-- `X-RateLimit-Reset`: Reset time"# bitcoin_backend" 
+- `X-RateLimit-Reset`: Reset time

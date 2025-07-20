@@ -17,12 +17,12 @@ export function encryptData(text: string): EncryptedData {
   const iv = crypto.randomBytes(IV_LENGTH);
   const cipher = crypto.createCipher(ENCRYPTION_ALGORITHM, ENCRYPTION_KEY);
   cipher.setAAD(Buffer.from('CryptoStrategy', 'utf8'));
-  
+
   let encrypted = cipher.update(text, 'utf8', 'hex');
   encrypted += cipher.final('hex');
-  
+
   const tag = cipher.getAuthTag();
-  
+
   return {
     iv: iv.toString('hex'),
     tag: tag.toString('hex'),
@@ -35,10 +35,10 @@ export function decryptData(encryptedData: EncryptedData): string {
   const decipher = crypto.createDecipher(ENCRYPTION_ALGORITHM, ENCRYPTION_KEY);
   decipher.setAAD(Buffer.from('CryptoStrategy', 'utf8'));
   decipher.setAuthTag(Buffer.from(encryptedData.tag, 'hex'));
-  
+
   let decrypted = decipher.update(encryptedData.data, 'hex', 'utf8');
   decrypted += decipher.final('utf8');
-  
+
   return decrypted;
 }
 
@@ -46,7 +46,7 @@ export function decryptData(encryptedData: EncryptedData): string {
 export function hashWithSalt(data: string, salt?: string): { hash: string; salt: string } {
   const saltBuffer = salt ? Buffer.from(salt, 'hex') : crypto.randomBytes(32);
   const hash = crypto.pbkdf2Sync(data, saltBuffer, 100000, 64, 'sha512');
-  
+
   return {
     hash: hash.toString('hex'),
     salt: saltBuffer.toString('hex')
@@ -80,11 +80,11 @@ export function validateWebhookSignature(payload: string, signature: string, sec
     .createHmac('sha256', secret)
     .update(payload)
     .digest('hex');
-    
-  const providedSignature = signature.startsWith('sha256=') 
-    ? signature.slice(7) 
+
+  const providedSignature = signature.startsWith('sha256=')
+    ? signature.slice(7)
     : signature;
-    
+
   return crypto.timingSafeEqual(
     Buffer.from(expectedSignature, 'hex'),
     Buffer.from(providedSignature, 'hex')
@@ -134,13 +134,11 @@ export function generateRateLimitKey(ip: string, endpoint: string): string {
 // Data anonymization for logs
 export function anonymizeData(data: any): any {
   const anonymized = JSON.parse(JSON.stringify(data));
-  
-  // Remove or hash sensitive fields
   const sensitiveFields = ['password', 'token', 'secret', 'key', 'email', 'phone'];
-  
+
   function anonymizeObject(obj: any): any {
     if (typeof obj !== 'object' || obj === null) return obj;
-    
+
     for (const key in obj) {
       if (sensitiveFields.some(field => key.toLowerCase().includes(field))) {
         obj[key] = crypto.createHash('sha256').update(String(obj[key])).digest('hex').substring(0, 8) + '***';
@@ -148,9 +146,9 @@ export function anonymizeData(data: any): any {
         obj[key] = anonymizeObject(obj[key]);
       }
     }
-    
+
     return obj;
   }
-  
+
   return anonymizeObject(anonymized);
 }
