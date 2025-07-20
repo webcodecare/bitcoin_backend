@@ -47,18 +47,19 @@ app.use(
   cors({
     origin:
       process.env.NODE_ENV === "production"
-        ? ["*"]
+        ? ["*"]  // Allow all domains in production (consider restricting this)
         : [
-            "https://crypto-kings-frontend.vercel.app",
-            "http://localhost:3000",
-            "http://localhost:5000",
-            "http://localhost:5173",
+            "https://crypto-kings-frontend.vercel.app", // Frontend domain
+            "http://localhost:3000", // Local dev
+            "http://localhost:5000", // Local dev
+            "http://localhost:5173", // Local dev
           ],
     credentials: true,
     methods: ["GET", "POST", "PUT", "DELETE", "PATCH", "OPTIONS"],
     allowedHeaders: ["Content-Type", "Authorization", "X-Requested-With"],
   })
 );
+
 
 // Rate limiting
 const limiter = rateLimit({
