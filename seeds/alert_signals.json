@@ -1,0 +1,38 @@
+[
+  {
+    "ticker": "BTCUSDT",
+    "signalType": "buy",
+    "price": "43250.50",
+    "timestamp": "2024-07-31T08:30:00.000Z",
+    "timeframe": "4H",
+    "source": "trading_algorithm",
+    "note": "Strong support level break, momentum building"
+  },
+  {
+    "ticker": "ETHUSDT", 
+    "signalType": "sell",
+    "price": "2345.75",
+    "timestamp": "2024-07-31T10:15:00.000Z",
+    "timeframe": "1H",
+    "source": "webhook",
+    "note": "Resistance rejection, bearish divergence"
+  },
+  {
+    "ticker": "BNBUSDT",
+    "signalType": "buy",
+    "price": "589.25",
+    "timestamp": "2024-07-31T12:45:00.000Z",
+    "timeframe": "12H",
+    "source": "manual_analysis",
+    "note": "Bullish flag pattern completion"
+  },
+  {
+    "ticker": "SOLUSDT",
+    "signalType": "buy",
+    "price": "178.90",
+    "timestamp": "2024-07-31T14:20:00.000Z",
+    "timeframe": "1D",
+    "source": "trading_algorithm",
+    "note": "Golden cross formation, volume surge"
+  }
+]

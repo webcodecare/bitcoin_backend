@@ -1,0 +1,16 @@
+                  id                  | user_id | ticker  | signal_type |   price   |      timestamp      | timeframe |   source   |                  note                   |         created_at         |         updated_at         
+--------------------------------------+---------+---------+-------------+-----------+---------------------+-----------+------------+-----------------------------------------+----------------------------+----------------------------
+ 11a7bd26-27ed-4141-a805-1244d917dc2c |         | BTCUSDT | buy         |  92400.00 | 2025-01-07 00:00:00 | 1W        | historical | January dip buy opportunity             | 2025-07-31 23:22:30.307425 | 2025-07-31 23:22:30.307425
+ a626973f-9daf-428a-9e4b-4e36444b3ea4 |         | BTCUSDT | sell        | 108000.00 | 2024-12-17 00:00:00 | 1W        | historical | Year-end profit taking begins           | 2025-07-31 23:22:30.307425 | 2025-07-31 23:22:30.307425
+ 782baee7-8950-40e6-b09a-253a6b6ef79f |         | BTCUSDT | buy         |  95600.00 | 2024-11-06 00:00:00 | 1W        | historical | Post-election bullish breakout          | 2025-07-31 23:22:30.307425 | 2025-07-31 23:22:30.307425
+ 3ab4015c-b462-4f0f-83f1-6634be990b8b |         | BTCUSDT | buy         |  67200.00 | 2024-09-19 00:00:00 | 1W        | historical | Q4 institutional accumulation           | 2025-07-31 23:22:30.307425 | 2025-07-31 23:22:30.307425
+ f4cfea99-7f9e-4cd6-8737-03b8b8e94181 |         | BTCUSDT | buy         |  56800.00 | 2024-07-05 00:00:00 | 1W        | historical | Mid-cycle correction recovery           | 2025-07-31 23:22:30.307425 | 2025-07-31 23:22:30.307425
+ 9fefe488-e898-4904-a0fb-b095169373cf |         | BTCUSDT | sell        |  73800.00 | 2024-03-28 00:00:00 | 1W        | historical | All-time high resistance                | 2025-07-31 23:22:30.307425 | 2025-07-31 23:22:30.307425
+ 184e3241-98a1-4572-8b8a-1adc445b388a |         | BTCUSDT | buy         |  42000.00 | 2024-02-12 00:00:00 | 1W        | historical | ETF approval rally begins               | 2025-07-31 23:22:30.307425 | 2025-07-31 23:22:30.307425
+ 1503c04b-ca06-40b2-8083-4e08a43ad9cd |         | BTCUSDT | buy         |  25800.00 | 2023-10-10 00:00:00 | 1W        | historical | Strong support retest successful        | 2025-07-31 23:22:30.307425 | 2025-07-31 23:22:30.307425
+ 94139959-65b6-4871-977d-41ac2be07b7f |         | BTCUSDT | sell        |  31000.00 | 2023-07-20 00:00:00 | 1W        | historical | Major resistance rejection              | 2025-07-31 23:22:30.307425 | 2025-07-31 23:22:30.307425
+ 039ca51d-b830-4186-a40b-b747d83c6084 |         | BTCUSDT | buy         |  26800.00 | 2023-06-05 00:00:00 | 1W        | historical | Breakout above 25k resistance           | 2025-07-31 23:22:30.307425 | 2025-07-31 23:22:30.307425
+ 625c45d4-4061-471b-9007-d19e85ac425d |         | BTCUSDT | sell        |  25200.00 | 2023-04-14 00:00:00 | 1W        | historical | Resistance at 25k level                 | 2025-07-31 23:22:30.307425 | 2025-07-31 23:22:30.307425
+ 0ea04047-e180-4850-a116-d064f2b3b57b |         | BTCUSDT | buy         |  15476.00 | 2023-01-02 00:00:00 | 1W        | historical | Support bounce after FTX crash recovery | 2025-07-31 23:22:30.307425 | 2025-07-31 23:22:30.307425
+(12 rows)
+

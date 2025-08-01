@@ -1,0 +1,58 @@
+[
+  {
+    "symbol": "BTCUSDT",
+    "description": "Bitcoin / USD Tether",
+    "category": "major",
+    "marketCap": 1,
+    "isEnabled": true
+  },
+  {
+    "symbol": "ETHUSDT",
+    "description": "Ethereum / USD Tether",
+    "category": "major",
+    "marketCap": 2,
+    "isEnabled": true
+  },
+  {
+    "symbol": "BNBUSDT",
+    "description": "BNB / USD Tether",
+    "category": "layer1",
+    "marketCap": 3,
+    "isEnabled": true
+  },
+  {
+    "symbol": "ADAUSDT",
+    "description": "Cardano / USD Tether",
+    "category": "layer1",
+    "marketCap": 8,
+    "isEnabled": true
+  },
+  {
+    "symbol": "SOLUSDT",
+    "description": "Solana / USD Tether",
+    "category": "layer1",
+    "marketCap": 5,
+    "isEnabled": true
+  },
+  {
+    "symbol": "XRPUSDT",
+    "description": "XRP / USD Tether",
+    "category": "legacy",
+    "marketCap": 4,
+    "isEnabled": true
+  },
+  {
+    "symbol": "DOTUSDT",
+    "description": "Polkadot / USD Tether",
+    "category": "layer1",
+    "marketCap": 15,
+    "isEnabled": true
+  },
+  {
+    "symbol": "LINKUSDT",
+    "description": "Chainlink / USD Tether",
+    "category": "utility",
+    "marketCap": 12,
+    "isEnabled": true
+  }
+]

@@ -1,105 +1,118 @@
-import { createServer } from "http";
 import express from "express";
+import { registerRoutes } from "./routes.js";
+import { config } from "./config.js";
 import helmet from "helmet";
 import cors from "cors";
-import dotenv from "dotenv";
-dotenv.config();
-
-// Cleaned: bodyParser removed since express.json handles parsing
 import rateLimit from "express-rate-limit";
 
-import { registerRoutes } from "./routes.js";
-import { initializeTickers } from "./init-tickers.js";
-import { startNotificationProcessor } from "./services/scheduledProcessor.js";
-import { securityMiddleware } from "./middleware/security.js";
-import { dataValidationMiddleware } from "./middleware/dataValidation.js";
-
 const app = express();
-const port = Number(process.env.PORT) || 3001;
+const port = config.port;
 
-// Middleware setup
-app.use(express.json());
-app.use(express.urlencoded({ extended: true }));
-
-app.use(
-  helmet({
-    contentSecurityPolicy: {
-      directives: {
-        defaultSrc: ["'self'"],
-        styleSrc: ["'self'", "'unsafe-inline'", "https:"],
-        scriptSrc: ["'self'", "'unsafe-inline'", "'unsafe-eval'", "https:"],
-        imgSrc: ["'self'", "data:", "https:"],
-        connectSrc: ["'self'", "https:", "wss:"],
-        frameSrc: ["'self'", "https:"],
-        fontSrc: ["'self'", "https:", "data:"],
-        objectSrc: ["'none'"],
-        mediaSrc: ["'self'", "https:"],
-        workerSrc: ["'self'", "blob:"],
-        upgradeInsecureRequests: [],
-      },
+// Security middleware
+app.use(helmet({
+  contentSecurityPolicy: {
+    directives: {
+      defaultSrc: ["'self'"],
+      styleSrc: ["'self'", "'unsafe-inline'", "https:"],
+      scriptSrc: ["'self'", "'unsafe-inline'", "'unsafe-eval'", "https:"],
+      imgSrc: ["'self'", "data:", "https:"],
+      connectSrc: ["'self'", "https:", "wss:"],
+      frameSrc: ["'self'", "https:"],
+      fontSrc: ["'self'", "https:", "data:"],
+      objectSrc: ["'none'"],
+      mediaSrc: ["'self'", "https:"],
+      workerSrc: ["'self'", "blob:"],
+      upgradeInsecureRequests: [],
     },
-    crossOriginEmbedderPolicy: false,
-    crossOriginResourcePolicy: { policy: "cross-origin" },
-  })
-);
+  },
+  crossOriginEmbedderPolicy: false,
+  crossOriginResourcePolicy: { policy: "cross-origin" }
+}));
 
-app.use(
-  cors({
-    origin:
-      process.env.NODE_ENV === "production"
-        ? ["*"]  // Allow all domains in production (consider restricting this)
-        : [
-            "https://crypto-kings-frontend.vercel.app", // Frontend domain
-            "http://localhost:3000", // Local dev
-            "http://localhost:5000", // Local dev
-            "http://localhost:5173", // Local dev
-          ],
-    credentials: true,
-    methods: ["GET", "POST", "PUT", "DELETE", "PATCH", "OPTIONS"],
-    allowedHeaders: ["Content-Type", "Authorization", "X-Requested-With"],
-  })
-);
+// CORS Configuration
+const corsOrigins = config.corsOrigin 
+  ? config.corsOrigin.split(',').map(origin => origin.trim())
+  : config.nodeEnv === 'production' 
+    ? ['*'] // Allow all origins for API-only deployment
+    : ['http://localhost:3000', 'http://localhost:5000', 'http://localhost:5173'];
 
+app.use(cors({
+  origin: corsOrigins,
+  credentials: true,
+  methods: ['GET', 'POST', 'PUT', 'DELETE', 'PATCH', 'OPTIONS'],
+  allowedHeaders: ['Content-Type', 'Authorization', 'X-Requested-With']
+}));
 
-// Rate limiting
+// Trust proxy for deployment environments
+app.set('trust proxy', 1);
+
+// Rate limiting middleware
 const limiter = rateLimit({
-  windowMs: 15 * 60 * 1000,
-  max: 100,
-  message: "Too many requests from this IP, please try again later.",
+  windowMs: 900000, // 15 minutes
+  max: 1000, // Increased limit for API usage
+  message: {
+    error: 'Too many requests from this IP, please try again later.',
+    code: 'RATE_LIMIT_EXCEEDED',
+    timestamp: new Date().toISOString()
+  },
+  standardHeaders: true,
+  legacyHeaders: false,
+  skip: (req) => {
+    // Skip rate limiting for health checks
+    return req.path === '/api/health' || req.path === '/health';
+  }
 });
-app.use("/api", limiter);
 
-// Security & validation middleware
-app.use(securityMiddleware);
-app.use(dataValidationMiddleware);
+app.use(limiter);
 
-// Only log warnings for missing services in development
-if (process.env.NODE_ENV === "development") {
-  console.log("⚠️ SMS Service not configured - missing Twilio credentials");
-  console.log("⚠️ Telegram Service not configured - missing bot token");
-}
+// Body parsing middleware
+app.use(express.json({ limit: '10mb' }));
+app.use(express.urlencoded({ extended: true, limit: '10mb' }));
 
-// HTTP server
-const server = createServer(app);
+// Basic error handling
+app.use((err: any, req: any, res: any, next: any) => {
+  console.error('Server error:', err);
+  res.status(500).json({
+    message: 'Internal server error',
+    code: 'INTERNAL_ERROR',
+    timestamp: new Date().toISOString()
+  });
+});
 
-// Async initialization wrapped in IIFE
-(async () => {
+async function startServer() {
   try {
-    // Register WebSocket routes
-    await registerRoutes(app);
+    console.log('🚀 Starting backend server...');
+    console.log(`📊 Environment: ${config.nodeEnv}`);
+    console.log(`🔗 Database URL: ${config.databaseUrl ? 'Configured' : 'Not configured'}`);
+    console.log(`🔐 JWT Secret: ${config.jwtSecret ? 'Configured' : 'Not configured'}`);
 
-    // Initialize crypto tickers and services
-    await initializeTickers();
-    console.log("✅ Cryptocurrency tickers initialized successfully");
-
-    // Start background processors
-    startNotificationProcessor();
+    // Register all routes
+    const httpServer = await registerRoutes(app);
 
     // Start the server
-    server.listen(port, "0.0.0.0", () => {
-      console.log(`🚀 Backend API server running on port ${port}`);
+    httpServer.listen(port, () => {
+      console.log(`✅ Server running on port ${port}`);
+      console.log(`🌐 Health check: http://localhost:${port}/api/health`);
+      console.log(`📡 WebSocket: ws://localhost:${port}/ws`);
+      console.log(`🔧 CORS Origins: ${corsOrigins.join(', ')}`);
     });
+
   } catch (error) {
-    console.error("❌ Error during server startup:", error);
+    console.error('❌ Failed to start server:', error);
+    process.exit(1);
   }
-})();
+}
+
+// Handle graceful shutdown
+process.on('SIGTERM', () => {
+  console.log('🔄 SIGTERM received, shutting down gracefully...');
+  process.exit(0);
+});
+
+process.on('SIGINT', () => {
+  console.log('🔄 SIGINT received, shutting down gracefully...');
+  process.exit(0);
+});
+
+// Start the server
+startServer();

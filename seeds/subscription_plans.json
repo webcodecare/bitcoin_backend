@@ -1,0 +1,46 @@
+[
+  {
+    "name": "Free Plan",
+    "tier": "free",
+    "stripePriceId": "price_free",
+    "monthlyPrice": 0,
+    "yearlyPrice": 0,
+    "features": ["Basic signals", "5 tickers", "Email notifications"],
+    "maxSignals": 10,
+    "maxTickers": 5,
+    "isActive": true
+  },
+  {
+    "name": "Basic Plan",
+    "tier": "basic",
+    "stripePriceId": "price_basic_monthly",
+    "monthlyPrice": 1999,
+    "yearlyPrice": 19990,
+    "features": ["Advanced signals", "15 tickers", "Email + SMS notifications", "Basic analytics"],
+    "maxSignals": 50,
+    "maxTickers": 15,
+    "isActive": true
+  },
+  {
+    "name": "Premium Plan",
+    "tier": "premium",
+    "stripePriceId": "price_premium_monthly",
+    "monthlyPrice": 4999,
+    "yearlyPrice": 49990,
+    "features": ["Pro signals", "Unlimited tickers", "All notifications", "Advanced analytics", "Webhooks"],
+    "maxSignals": 200,
+    "maxTickers": 999,
+    "isActive": true
+  },
+  {
+    "name": "Pro Plan",
+    "tier": "pro",
+    "stripePriceId": "price_pro_monthly",
+    "monthlyPrice": 9999,
+    "yearlyPrice": 99990,
+    "features": ["Expert signals", "Unlimited everything", "Priority support", "API access", "Custom integrations"],
+    "maxSignals": 9999,
+    "maxTickers": 9999,
+    "isActive": true
+  }
+]

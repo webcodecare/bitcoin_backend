@@ -1,0 +1,67 @@
+[
+  {
+    "symbol": "BTCUSDT",
+    "interval": "1h",
+    "data": {
+      "timestamp": "2025-07-31T10:00:00.000Z",
+      "open": "118450.25",
+      "high": "118650.80",
+      "low": "118380.15",
+      "close": "118549.99",
+      "volume": "1245.67890123"
+    },
+    "lastUpdated": "2025-07-31T11:00:00.000Z"
+  },
+  {
+    "symbol": "ETHUSDT",
+    "interval": "1h",
+    "data": {
+      "timestamp": "2025-07-31T10:00:00.000Z",
+      "open": "3685.45",
+      "high": "3698.20",
+      "low": "3672.10",
+      "close": "3691.85",
+      "volume": "8234.56789012"
+    },
+    "lastUpdated": "2025-07-31T11:00:00.000Z"
+  },
+  {
+    "symbol": "BNBUSDT",
+    "interval": "1h",
+    "data": {
+      "timestamp": "2025-07-31T10:00:00.000Z",
+      "open": "598.75",
+      "high": "602.30",
+      "low": "596.20",
+      "close": "600.15",
+      "volume": "567.89012345"
+    },
+    "lastUpdated": "2025-07-31T11:00:00.000Z"
+  },
+  {
+    "symbol": "ADAUSDT",
+    "interval": "1h",
+    "data": {
+      "timestamp": "2025-07-31T10:00:00.000Z",
+      "open": "0.9825",
+      "high": "0.9890",
+      "low": "0.9780",
+      "close": "0.9852",
+      "volume": "12345.67890123"
+    },
+    "lastUpdated": "2025-07-31T11:00:00.000Z"
+  },
+  {
+    "symbol": "SOLUSDT",
+    "interval": "1h",
+    "data": {
+      "timestamp": "2025-07-31T10:00:00.000Z",
+      "open": "178.25",
+      "high": "180.45",
+      "low": "177.80",
+      "close": "179.95",
+      "volume": "3456.78901234"
+    },
+    "lastUpdated": "2025-07-31T11:00:00.000Z"
+  }
+]

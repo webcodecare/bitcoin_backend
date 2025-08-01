@@ -1,0 +1,93 @@
+[
+  {
+    "userEmail": "admin@proudprofits.com",
+    "tickers": ["BTCUSDT", "ETHUSDT", "BNBUSDT", "ADAUSDT", "SOLUSDT", "XRPUSDT", "DOTUSDT", "LINKUSDT"],
+    "alertTypes": ["buy", "sell", "price_target", "support_resistance", "volume_spike", "news"],
+    "deliveryMethods": ["email", "sms", "push", "telegram", "webhook"],
+    "priceThresholds": {
+      "BTCUSDT": {"upper": 125000, "lower": 110000},
+      "ETHUSDT": {"upper": 4000, "lower": 3200},
+      "BNBUSDT": {"upper": 650, "lower": 550},
+      "ADAUSDT": {"upper": 1.20, "lower": 0.80},
+      "SOLUSDT": {"upper": 200, "lower": 150},
+      "XRPUSDT": {"upper": 0.80, "lower": 0.50},
+      "DOTUSDT": {"upper": 12.00, "lower": 8.00},
+      "LINKUSDT": {"upper": 25.00, "lower": 18.00}
+    },
+    "isActive": true,
+    "maxAlertsPerDay": 999,
+    "customWebhook": "https://admin.webhook.example.com/alerts",
+    "telegramChatId": "@admin_pp",
+    "notes": "Admin account - all features enabled"
+  },
+  {
+    "userEmail": "demo@proudprofits.com",
+    "tickers": ["BTCUSDT", "ETHUSDT", "BNBUSDT", "ADAUSDT", "SOLUSDT"],
+    "alertTypes": ["buy", "sell", "price_target", "support_resistance"],
+    "deliveryMethods": ["email", "push"],
+    "priceThresholds": {
+      "BTCUSDT": {"upper": 120000, "lower": 115000},
+      "ETHUSDT": {"upper": 3800, "lower": 3400},
+      "BNBUSDT": {"upper": 620, "lower": 580},
+      "ADAUSDT": {"upper": 1.10, "lower": 0.90},
+      "SOLUSDT": {"upper": 190, "lower": 160}
+    },
+    "isActive": true,
+    "maxAlertsPerDay": 200,
+    "customWebhook": null,
+    "telegramChatId": null,
+    "notes": "Premium demo account with advanced features"
+  },
+  {
+    "userEmail": "test@proudprofits.com",
+    "tickers": ["BTCUSDT", "ETHUSDT", "BNBUSDT"],
+    "alertTypes": ["buy", "sell", "price_target"],
+    "deliveryMethods": ["email", "push"],
+    "priceThresholds": {
+      "BTCUSDT": {"upper": 125000, "lower": 110000},
+      "ETHUSDT": {"upper": 4000, "lower": 3200},
+      "BNBUSDT": {"upper": 650, "lower": 550}
+    },
+    "isActive": true,
+    "maxAlertsPerDay": 50,
+    "customWebhook": null,
+    "telegramChatId": null,
+    "notes": "Basic plan test account"
+  },
+  {
+    "userEmail": "user@proudprofits.com",
+    "tickers": ["BTCUSDT", "ETHUSDT"],
+    "alertTypes": ["buy", "sell"],
+    "deliveryMethods": ["email"],
+    "priceThresholds": {
+      "BTCUSDT": {"upper": 130000, "lower": 100000},
+      "ETHUSDT": {"upper": 4500, "lower": 3000}
+    },
+    "isActive": true,
+    "maxAlertsPerDay": 10,
+    "customWebhook": null,
+    "telegramChatId": null,
+    "notes": "Free tier user with basic alerts"
+  },
+  {
+    "userEmail": "pro@proudprofits.com",
+    "tickers": ["BTCUSDT", "ETHUSDT", "BNBUSDT", "ADAUSDT", "SOLUSDT", "XRPUSDT", "DOTUSDT", "LINKUSDT"],
+    "alertTypes": ["buy", "sell", "price_target", "support_resistance", "volume_spike", "news", "technical_analysis", "whale_movement"],
+    "deliveryMethods": ["email", "sms", "push", "telegram", "webhook"],
+    "priceThresholds": {
+      "BTCUSDT": {"upper": 122000, "lower": 117000},
+      "ETHUSDT": {"upper": 3750, "lower": 3550},
+      "BNBUSDT": {"upper": 610, "lower": 590},
+      "ADAUSDT": {"upper": 1.05, "lower": 0.95},
+      "SOLUSDT": {"upper": 185, "lower": 175},
+      "XRPUSDT": {"upper": 0.75, "lower": 0.65},
+      "DOTUSDT": {"upper": 11.50, "lower": 9.50},
+      "LINKUSDT": {"upper": 22.00, "lower": 20.00}
+    },
+    "isActive": true,
+    "maxAlertsPerDay": 999,
+    "customWebhook": "https://pro.webhook.example.com/trading-signals",
+    "telegramChatId": "@pro_trader_pp",
+    "notes": "Pro trader account with real-time signals and custom integrations"
+  }
+]
